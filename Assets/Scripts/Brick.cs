@@ -17,13 +17,13 @@ public class Brick : MonoBehaviour
         MaterialPropertyBlock block = new MaterialPropertyBlock();
         switch (PointValue)
         {
-            case 1 :
+            case 100 :
                 block.SetColor("_BaseColor", Color.green);
                 break;
-            case 2:
+            case 200:
                 block.SetColor("_BaseColor", Color.yellow);
                 break;
-            case 5:
+            case 500:
                 block.SetColor("_BaseColor", Color.blue);
                 break;
             default:
