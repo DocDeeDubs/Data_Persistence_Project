@@ -1,31 +1,52 @@
+//phasing this out to game manager instead;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using TMPro;
 
 public class MainManager : MonoBehaviour
 {
-    public Brick BrickPrefab;
+    //public static MainManager Instance;
+
+    
+    public Brick BrickPrefab; // the prefab with the brick. 
     public int LineCount = 6;
     public Rigidbody Ball;
 
-    public Text ScoreText;
+    public TMP_Text ScoreText;
     public GameObject GameOverText;
-    
+    public GameObject CongratsText;
+    public TMP_Text BestScoreText;
+
     private bool m_Started = false;
     private int m_Points;
     
     private bool m_GameOver = false;
 
-    
+
+   /* private void Awake()
+    {
+        if (Instance != null)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+
+    }*/
+
+  
+
     // Start is called before the first frame update
     void Start()
     {
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
         
-        int[] pointCountArray = new [] {1,1,2,2,5,5};
+        int[] pointCountArray = new [] {100,100,200,200,500,500};
         for (int i = 0; i < LineCount; ++i)
         {
             for (int x = 0; x < perLine; ++x)
@@ -36,6 +57,14 @@ public class MainManager : MonoBehaviour
                 brick.onDestroyed.AddListener(AddPoint);
             }
         }
+        //update the high score display
+        int highScore = GameManager.gameManagerInstance.highScore;
+        if(highScore > 0)
+        {
+            BestScoreText.text = "Best Score: " + GameManager.gameManagerInstance.highScoreUserName + " - " + GameManager.gameManagerInstance.highScore;
+        }
+            
+
     }
 
     private void Update()
@@ -55,22 +84,44 @@ public class MainManager : MonoBehaviour
         }
         else if (m_GameOver)
         {
+
             if (Input.GetKeyDown(KeyCode.Space))
             {
-                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+                SceneManager.LoadScene("menu");
             }
+           
         }
     }
 
     void AddPoint(int point)
     {
         m_Points += point;
-        ScoreText.text = $"Score : {m_Points}";
+        ScoreText.text = $"{GameManager.gameManagerInstance.userName}'s Score : {m_Points}";
+        GameManager.gameManagerInstance.currentScore = m_Points;
     }
 
     public void GameOver()
     {
         m_GameOver = true;
         GameOverText.SetActive(true);
+        // //see if current score is good enough for high score list
+        if(GameManager.gameManagerInstance.SaveHighScore(GameManager.gameManagerInstance.userName, GameManager.gameManagerInstance.currentScore))
+        {
+            CongratsText.SetActive(true);
+            BestScoreText.text = "Best Score: " + GameManager.gameManagerInstance.userName + " - " + GameManager.gameManagerInstance.currentScore;
+
+        }
+
+
+    }
+
+    public void SaveUserName()
+    {
+        
+        Debug.Log("I will save the username: ");
+    }
+    public void LoadUserName()
+    {
+        Debug.Log("I will load the username: ");
     }
 }
